@@ -124,7 +124,14 @@ def add_row_to_excel(graph_client, data):
     if ref_id in df['Reference ID'].values:
         index = df.index[df['Reference ID'] == ref_id].tolist()[0]
         for key in data.keys():
-            df.at[index, key] = data[key]
+            if isinstance(data[key], str):
+                try:
+                    # Convert string to float
+                    df.at[index, key] = float(data[key].replace(',', ''))
+                except ValueError:
+                    pass
+            else:
+                df.at[index, key] = data[key]
     else:
         new_row = pd.DataFrame([data])
         df = pd.concat([df, new_row], ignore_index=True)
