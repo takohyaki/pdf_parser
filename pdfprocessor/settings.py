@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +21,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zc2x2^)s)c^_-^!yu*#c(s$cy#+-3z2@!dl$v&eu(z*f+b2%l2'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './logs/django_debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 ALLOWED_HOSTS = []
 
@@ -126,3 +146,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media files configuration
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+CLIENT_ID = config('CLIENT_ID')
+CLIENT_SECRET = config('CLIENT_SECRET')
+TENANT_ID = config('TENANT_ID')
+DRIVE_ID = config('DRIVE_ID')
+EXCEL_FILE_PATH = config('EXCEL_FILE_PATH')

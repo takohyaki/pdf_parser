@@ -3,6 +3,9 @@ import re
 import fitz
 import pandas as pd
 import openpyxl
+import io
+from msal import ConfidentialClientApplication
+from django.conf import settings
 
 reference_id_pattern = re.compile(r"Ref ID:\s([0-9A-Z]+)\s*\n\s*([0-9]{2} [A-Za-z]{3} 2023)?")
 application_date_pattern = re.compile(r"application dated ([0-9]{2} [A-Za-z]{3} 2023)")
@@ -67,7 +70,7 @@ def extract_LOF_info(pdf_path):
         "Package": package,
         "Level of Support (%)": level_of_support,
         "Billing Currency": billing_currency,
-        "Qualifying Cost (S$)": qualifying_cost
+        "Qualifying Cost": qualifying_cost
     }
 
     return extracted_info
@@ -93,7 +96,7 @@ def extract_app_info(file_path):
         company_name_match = company_name_pattern.search(text)
 
         extracted_info = {
-            "Company Name": company_name_match.group(1).strip() if company_name_match else "Not Found",
+            "Company": company_name_match.group(1).strip() if company_name_match else "Not Found",
             "Project Title": project_title_match.group(1).strip() if project_title_match else "Not Found",
             "Project Start Date": project_start_date_match.group(1).strip() if project_start_date_match else "Not Found",
             "Project End Date": project_end_date_match.group(1).strip() if project_end_date_match else "Not Found",
@@ -106,26 +109,30 @@ def extract_app_info(file_path):
         print(f"Error processing file {file_path}: {e}")
         return None
 
-def add_row_to_excel(data, file_path='MRA_2023_data.xlsx'):
-    # Load the existing Excel file into a DataFrame
+def add_row_to_excel(graph_client, data):
+    file_content = graph_client.download_file(settings.DRIVE_ID, settings.EXCEL_FILE_PATH)
+    if file_content is None:
+        return "Error: File not found or unable to download."
+
     try:
-        df = pd.read_excel(file_path)
+        df = pd.read_excel(io.BytesIO(file_content))
     except FileNotFoundError:
-        # Create a new DataFrame with columns from 'data' if the file doesn't exist
         df = pd.DataFrame(columns=data.keys())
 
-    ref_id = data.get('Reference ID')
+    ref_id = data.get('Reference ID', 'Default Value')
 
-    # Check if the Reference ID already exists in the DataFrame
     if ref_id in df['Reference ID'].values:
-        # Find the index of the row with the matching Reference ID
         index = df.index[df['Reference ID'] == ref_id].tolist()[0]
-        # Update the row at the found index
         for key in data.keys():
             df.at[index, key] = data[key]
     else:
-        # Append a new row if Reference ID doesn't exist
-        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
+        new_row = pd.DataFrame([data])
+        df = pd.concat([df, new_row], ignore_index=True)
 
-    # Save the updated DataFrame back to the Excel file
-    df.to_excel(file_path, index=False)
+    output = io.BytesIO()
+    df.to_excel(output, index=False)
+    output.seek(0)
+
+    upload_success = graph_client.upload_file(settings.DRIVE_ID, settings.EXCEL_FILE_PATH, output.read())
+    return "File updated successfully." if upload_success else "Error: Unable to upload the file."
+

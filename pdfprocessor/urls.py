@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from pdfapp.views import get_microsoft_file
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('pdfapp/', include('pdfapp.urls')),  # Include the app's URLs
+    path('pdfapp/', include('pdfapp.urls')),
+    path('get-microsoft-file/', get_microsoft_file, name='get_microsoft_file'),
 ]
 
