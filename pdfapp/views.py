@@ -43,16 +43,13 @@ tenant_id = settings.TENANT_ID
 drive_id = settings.DRIVE_ID
 excel_file_path = settings.EXCEL_FILE_PATH
 
-def get_microsoft_file(self, drive_id, file_path):
-    if self.access_token is None:
-        self.get_access_token()
+def get_microsoft_file(drive_id, file_path):
+    graph_client = MicrosoftGraphClient(settings.CLIENT_ID, settings.CLIENT_SECRET, settings.TENANT_ID)
 
-    headers = {'Authorization': 'Bearer ' + self.access_token}
-    file_url = f'https://graph.microsoft.com/v1.0/drives/{drive_id}/root:/{excel_file_path}'
-    response = requests.get(file_url, headers=headers)
+    file_response = graph_client.get_file(file_path)
 
-    if response.status_code == 200:
-        return response.json()
+    if file_response:
+        return file_response
     else:
         return None
 

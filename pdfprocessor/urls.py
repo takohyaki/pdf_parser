@@ -16,12 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from pdfapp.views import get_microsoft_file
+from pdfapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('pdfapp/', include('pdfapp.urls')),
-    path('get-microsoft-file/', get_microsoft_file, name='get_microsoft_file'),
-    path('', views.home, name='home'),
+    path('', views.home, name='home'),  # Root URL to home view
 ]
-
