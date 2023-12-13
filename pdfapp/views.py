@@ -8,6 +8,9 @@ from .microsoft_graph_client import MicrosoftGraphClient
 from django.conf import settings
 import requests
 
+def index(request):
+    return render(request, 'index.html')
+
 def file_upload(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
