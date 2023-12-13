@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('pdfapp/', include('pdfapp.urls')),
     path('get-microsoft-file/', get_microsoft_file, name='get_microsoft_file'),
+    path('', views.home, name='home'),
 ]
 

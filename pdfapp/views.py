@@ -58,3 +58,6 @@ def get_microsoft_file(self, drive_id, file_path):
         return response.json()
     else:
         return None
+
+def home(request):
+    return render(request, 'index.html')
