@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Successful</title>
+</head>
+<body>
+    <h1>File Uploaded Successfully!</h1>
+    {% if upload_success %}
+        <p>The file for {{ reference_id }} has been processed and added to the excel sheet.</p>
+        <a href="https://simplegroupsg.sharepoint.com/:x:/r/sites/MRAGrants/Shared%20Documents/General/MRA%20Grants%20%26%20Deliverables%20-%20Copy%20(Tammie).xlsx?d=we9b1d5d555504ff0bb584f76ca084c4a&csf=1&web=1&e=gBm6pJ" target="_blank"><button>Check the Excel File</button></a>
+    {% else %}
+        <p>Your file has been successfully uploaded and processed.</p>
+    {% endif %}
+    <a href="{% url 'file_upload' %}"><button>Upload Another File</button></a>
+</body>
+</html>
