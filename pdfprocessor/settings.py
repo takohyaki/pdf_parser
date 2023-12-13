@@ -46,7 +46,7 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = ['pdf-parser-tau.vercel.app', 'pdf-parser-git-master-takohyakis-projects.vercel.app']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
