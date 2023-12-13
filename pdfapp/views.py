@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .forms import UploadFileForm
-from .models import UploadedFile
+# from .models import UploadedFile
 from .tasks import extract_LOF_info, extract_app_info, add_row_to_excel
 import os
 from .microsoft_graph_client import MicrosoftGraphClient
@@ -12,21 +12,23 @@ def file_upload(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            uploaded_file = UploadedFile(file=request.FILES['file'])
-            uploaded_file.save()
+            file = request.FILES['file']
+            file_content = file.read()  # Read the file content
 
-            file_path = uploaded_file.file.path
-            if 'Letter_of_Offer' in file_path:
-                parsed_data = extract_LOF_info(file_path)
+            if 'Letter_of_Offer' in file.name:
+                parsed_data = extract_LOF_info(file_content, file.name)
             else:
-                parsed_data = extract_app_info(file_path)
+                parsed_data = extract_app_info(file_content, file.name)
 
             if parsed_data:
                 graph_client = MicrosoftGraphClient(settings.CLIENT_ID, settings.CLIENT_SECRET, settings.TENANT_ID)
-                result = add_row_to_excel(graph_client, parsed_data)  # Updated call
+                result = add_row_to_excel(graph_client, parsed_data)
 
                 if result == "File updated successfully.":
-                    return render(request, 'fileuploader/upload_success.html')
+                    return render(request, 'fileuploader/upload_success.html', {
+                        'reference_id': parsed_data.get('Reference ID', 'Unknown'),
+                        'upload_success': True
+                    })
                 else:
                     return HttpResponse(result, status=500)
             else:
@@ -53,4 +55,3 @@ def get_microsoft_file(self, drive_id, file_path):
         return response.json()
     else:
         return None
-

@@ -10,11 +10,8 @@ from django.conf import settings
 reference_id_pattern = re.compile(r"Ref ID:\s([0-9A-Z]+)\s*\n\s*([0-9]{2} [A-Za-z]{3} 2023)?")
 application_date_pattern = re.compile(r"application dated ([0-9]{2} [A-Za-z]{3} 2023)")
 
-def extract_LOF_info(pdf_path):
-
-    # file name with extension
-    file_name = os.path.basename(pdf_path)
-
+def extract_LOF_info(file_content, file_name):
+    
     if 'VTF' in file_name:
         package = 'MRA1'
     elif 'BM' in file_name:
@@ -25,7 +22,7 @@ def extract_LOF_info(pdf_path):
         package = 'Unknown'
 
     # Open the PDF file
-    doc = fitz.open(pdf_path)
+    doc = fitz.open(stream=file_content, filetype="pdf")
 
     # Extract text from all pages
     text = "\n".join([page.get_text() for page in doc])
@@ -83,9 +80,9 @@ application_type_pattern = re.compile(r"Target Market\s*\n(.*?)(?=\n)", re.DOTAL
 ref_id_pattern = re.compile(r"Ref ID:\s*(.*)")
 company_name_pattern = re.compile(r"Registered Company Name\s*\n(.*)")
 
-def extract_app_info(file_path):
+def extract_app_info(file_content, file_name):
     try:
-        with fitz.open(file_path) as doc:
+        with fitz.open(stream=file_content, filetype="pdf") as doc:
             text = "\n".join([page.get_text() for page in doc])
 
         project_title_match = project_title_pattern.search(text)
@@ -106,7 +103,7 @@ def extract_app_info(file_path):
 
         return extracted_info
     except Exception as e:
-        print(f"Error processing file {file_path}: {e}")
+        print(f"Error processing file {file_name}: {e}") 
         return None
 
 def add_row_to_excel(graph_client, data):
