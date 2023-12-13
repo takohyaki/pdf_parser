@@ -45,7 +45,7 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pdfparserapp.azurewebsites.net', 'www.pdfparserapp.azurewebsites.net']
 
 
 # Application definition
