@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -152,3 +153,7 @@ CLIENT_SECRET = config('CLIENT_SECRET')
 TENANT_ID = config('TENANT_ID')
 DRIVE_ID = config('DRIVE_ID')
 EXCEL_FILE_PATH = config('EXCEL_FILE_PATH')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATIC_URL = 'https://django-static-takohyakis-projects.vercel.app/'  # URL where Vercel hosts your static files
